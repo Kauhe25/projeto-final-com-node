@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import conexao from '../services/connection';
 import { ResultSetHeader } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
 
 export const listaDepartamentos = async (req: Request, res: Response) => {
   console.log('GET Departamentos');
@@ -14,8 +15,10 @@ export const lerDepartamento = async (req: Request, res: Response) => {
 
   try{
     const { id } = req.params;
-    const [rows] = await conexao.query('SELECT * FROM DEPARTAMENTOS WHERE ID_DEPARTAMENTO = ?', [id]);
+    const [rows] = await conexao.query<RowDataPacket[]>('SELECT * FROM DEPARTAMENTOS WHERE ID_DEPARTAMENTO = ?', [id]);
     
+    console.log(rows);
+
     if (rows.length === 0) {
       res.status(404).json({ mensagem: 'Nenhum resultado encontrado' });
     }else {
@@ -124,5 +127,5 @@ export const alteracaoDepartamento = async (req: Request, res: Response): Promis
       message: 'Erro interno'
     });
   }
-  console.log(req.body);
+  //console.log(req.body);
 }
