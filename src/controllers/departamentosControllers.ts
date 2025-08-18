@@ -104,25 +104,24 @@ export const alteracaoDepartamento = async (req: Request, res: Response): Promis
   const { nome, sigla } = req.body;
   const { id } = req.params;
   try{
-    const [result] = await conexao.execute(`UPDATE DEPARTAMENTOS SET nome = ?, sigla = ? WHERE id_departamento = ?`, [nome, sigla, id] );
+    const [result] = await conexao.execute<ResultSetHeader>(
+      `UPDATE DEPARTAMENTOS SET nome = ?, sigla = ? WHERE id_departamento = ?`, 
+      [nome, sigla, id] );
 
-    res.status(201).json({
-      message: 'Departamento alterado com sucesso.'
-    });
-  } catch(e) {
-    let message: string;
-
-    switch (e.code) {
-      case 'ER_DUP_ENTRY':
-        message = 'Registro duplicado'
-      break;
-      default:
-        message = 'Erro interno';
-        break;
+    if (result.affectedRows === 0) {
+      res.status(404).json({ 
+        mensagem: 'Departamento não encontrado' 
+      });
+      return;
     }
 
+    res.json({
+      message: 'Departamento Alterado com Sucesso.',
+      id
+    });
+  } catch(e) {
     res.status(500).json({
-      message
+      message: 'Erro interno'
     });
   }
   console.log(req.body);
