@@ -77,7 +77,53 @@ export const excluiDepartamento = async (req: Request, res: Response) => {
     res.json({ mensagem: 'Departamento excluído com sucesso', id });
     return;
   }catch(e){
+    let message = '';
+
+    switch (e.code) {
+      case 'ER_ROW_IS_REFERENCED_2':
+        message = 'Departamento possui vínculos e não pode ser excluído';
+      break;
+      default:
+        message = 'Erro interno';
+      break;
+    }
+    res.status(500).json({
+      message
+    })
+
     console.error(e);
     res.status(500).json({ mensagem: 'Erro ao excluir departamento' });
   }
+}
+
+
+
+
+export const alteracaoDepartamento = async (req: Request, res: Response): Promise<void> => {
+
+  const { nome, sigla } = req.body;
+  const { id } = req.params;
+  try{
+    const [result] = await conexao.execute(`UPDATE DEPARTAMENTOS SET nome = ?, sigla = ? WHERE id_departamento = ?`, [nome, sigla, id] );
+
+    res.status(201).json({
+      message: 'Departamento alterado com sucesso.'
+    });
+  } catch(e) {
+    let message: string;
+
+    switch (e.code) {
+      case 'ER_DUP_ENTRY':
+        message = 'Registro duplicado'
+      break;
+      default:
+        message = 'Erro interno';
+        break;
+    }
+
+    res.status(500).json({
+      message
+    });
+  }
+  console.log(req.body);
 }
