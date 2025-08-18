@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 import conexao from '../services/connection';
+import { ResultSetHeader } from 'mysql2';
 
 export const listaDepartamentos = async (req: Request, res: Response) => {
   console.log('GET Departamentos');
@@ -10,15 +11,9 @@ export const listaDepartamentos = async (req: Request, res: Response) => {
 
 export const lerDepartamento = async (req: Request, res: Response) => {
   console.log('GET Departamento Específico');
-  const { id } = req.params;
-  console.log('identificador: '+id);
-  const [rows] = await conexao.query('SELECT * FROM DEPARTAMENTOS WHERE ID_DEPARTAMENTO = ?', [id]);
-  console.log('Resultado:', rows);
 
   try{
-
-    
-
+    const { id } = req.params;
     const [rows] = await conexao.query('SELECT * FROM DEPARTAMENTOS WHERE ID_DEPARTAMENTO = ?', [id]);
     
     if (rows.length === 0) {
@@ -62,4 +57,27 @@ export const insereDepartamento = async (req: Request, res: Response): Promise<v
 
   console.log(req.body);
   res.send("Funciona");
+}
+
+
+
+export const excluiDepartamento = async (req: Request, res: Response) => {
+  console.log('DELETE Departamento Específico');
+  const { id } = req.params;
+  
+  try{
+    const [result] = await conexao.execute<ResultSetHeader>(
+      'DELETE FROM DEPARTAMENTOS WHERE id_departamento = ?', [id]
+    );
+   
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ mensagem: 'Departamento não encontrado' });
+    }
+
+    res.json({ mensagem: 'Departamento excluído com sucesso', id });
+    return;
+  }catch(e){
+    console.error(e);
+    res.status(500).json({ mensagem: 'Erro ao excluir departamento' });
+  }
 }
