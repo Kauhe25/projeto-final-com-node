@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { listaDepartamentos } from "../controllers/departamentosControllers";
+import { insereDepartamento, listaDepartamentos } from "../controllers/departamentosControllers";
 
 const departamentosRoutes = Router();
+
 departamentosRoutes.get('/departamentos', listaDepartamentos);
+departamentosRoutes.post('/departamentos', insereDepartamento);
 
 export default departamentosRoutes;
