@@ -1,10 +1,12 @@
 import express from 'express';
 import defaultRoutes from './routes/defaultRoutes';
+import departamentosRoutes from './routes/departamentosRoutes';
 
 const app = express();
 const porta = 3030;
 
 app.use(defaultRoutes);
+app.use(departamentosRoutes);
 
 // Carregando a rota raiz
 /*app.get('/', (req: Request, res: Response): void => {
